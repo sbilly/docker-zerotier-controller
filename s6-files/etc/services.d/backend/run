@@ -1,0 +1,59 @@
+#!/usr/bin/with-contenv bash
+
+if [ -z "$NODE_ENV" ]; then
+    NODE_ENV=production
+fi
+
+if [ -z "$LISTEN_ADDRESS" ]; then
+    LISTEN_ADDRESS=0.0.0.0
+fi
+
+if [ -z "$ZU_SERVE_FRONTEND" ]; then
+    ZU_SERVE_FRONTEND=true
+fi
+
+if [ -z "$ZU_SECURE_HEADERS" ]; then
+    ZU_SECURE_HEADERS=false
+fi
+
+if [ -z "$ZU_CONTROLLER_ENDPOINT" ]; then
+    # check local.conf
+    while [ ! -f /app/config/local.conf ]; do
+        sleep 1
+    done
+    ZT_PRIMARY_PORT=`/bin/cat /app/config/local.conf | /usr/bin/jq -r '.settings.primaryPort'`
+    ZU_CONTROLLER_ENDPOINT=http://127.0.0.1:$ZT_PRIMARY_PORT/
+fi
+
+if [ -z "$ZU_CONTROLLER_TOKEN" ]; then
+    # check authtoken.secret
+    while [ ! -f /app/config/authtoken.secret ]; do
+        sleep 1
+    done
+    ZU_CONTROLLER_TOKEN=`/bin/cat /app/config/authtoken.secret`
+fi
+
+if [ -z "$ZU_DEFAULT_USERNAME" ]; then
+    ZU_DEFAULT_USERNAME=admin
+fi
+
+if [ -z "$ZU_DEFAULT_PASSWORD" ]; then
+    ZU_DEFAULT_PASSWORD=zero-ui
+fi
+
+if [ -z "$ZU_DATAPATH" ]; then
+    ZU_DATAPATH=data/db.json
+fi
+
+NODE_ENV=$NODE_ENV
+LISTEN_ADDRESS=$LISTEN_ADDRESS
+ZU_SERVE_FRONTEND=$ZU_SERVE_FRONTEND
+ZU_SECURE_HEADERS=$ZU_SECURE_HEADERS
+ZU_CONTROLLER_ENDPOINT=$ZU_CONTROLLER_ENDPOINT
+ZU_CONTROLLER_TOKEN=$ZU_CONTROLLER_TOKEN
+ZU_DEFAULT_USERNAME=$ZU_DEFAULT_USERNAME
+ZU_DEFAULT_PASSWORD=$ZU_DEFAULT_PASSWORD
+ZU_DATAPATH=$ZU_DATAPATH
+
+cd /app/backend
+NODE_ENV=${NODE_ENV} LISTEN_ADDRESS=${LISTEN_ADDRESS} ZU_SERVE_FRONTEND=${ZU_SERVE_FRONTEND} ZU_SECURE_HEADERS=${ZU_SECURE_HEADERS} ZU_CONTROLLER_ENDPOINT=${ZU_CONTROLLER_ENDPOINT} ZU_CONTROLLER_TOKEN=${ZU_CONTROLLER_TOKEN} ZU_DEFAULT_USERNAME=${ZU_DEFAULT_USERNAME} ZU_DEFAULT_PASSWORD=${ZU_DEFAULT_PASSWORD} /usr/bin/node /app/backend/bin/www

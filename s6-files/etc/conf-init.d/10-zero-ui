@@ -1,0 +1,41 @@
+#!/usr/bin/with-contenv sh
+
+mkdir -p /var/run/s6/container_environment
+
+if [ -z "$NODE_ENV" ]; then
+    printf "production" > /var/run/s6/container_environment/NODE_ENV
+fi
+
+if [ -z "$LISTEN_ADDRESS" ]; then
+    printf "0.0.0.0" > /var/run/s6/container_environment/LISTEN_ADDRESS
+fi
+
+if [ -z "$ZU_SERVE_FRONTEND" ]; then
+    printf "true" > /var/run/s6/container_environment/ZU_SERVE_FRONTEND
+fi
+
+if [ -z "$ZU_SECURE_HEADERS" ]; then
+    printf "false" > /var/run/s6/container_environment/ZU_SECURE_HEADERS
+fi
+
+if [ -z "$ZU_CONTROLLER_ENDPOINT" ]; then
+    printf "http://localhost:9993/" > /var/run/s6/container_environment/ZU_CONTROLLER_ENDPOINT
+fi
+
+if [ -z "$ZU_CONTROLLER_TOKEN" ]; then
+    if [ -f /app/config/authtoken.secret ]; then
+        cat /app/config/authtoken.secret > /var/run/s6/container_environment/ZU_CONTROLLER_TOKEN
+    fi
+fi
+
+if [ -z "$ZU_DEFAULT_USERNAME" ]; then
+    printf "admin" > /var/run/s6/container_environment/ZU_DEFAULT_USERNAME
+fi
+
+if [ -z "$ZU_DEFAULT_PASSWORD" ]; then
+    printf "zero-ui" > /var/run/s6/container_environment/ZU_DEFAULT_PASSWORD
+fi
+
+if [ -z "$ZU_DATAPATH" ]; then
+    printf "data/db.json" > /var/run/s6/container_environment/ZU_DATAPATH
+fi

@@ -1,0 +1,14 @@
+#!/usr/bin/with-contenv bash
+
+
+if [ -z "$ZT_PRIMARY_PORT" ]; then
+    ZT_PRIMARY_PORT=9993
+    printf "9993" > /var/run/s6/container_environment/ZT_PRIMARY_PORT
+fi
+
+while [ ! -f /app/config/local.conf ]; do
+    echo "'{'settings': {'primaryPort': ${ZT_PRIMARY_PORT},'allowManagementFrom': ['0.0.0.0/0']}}'" > /app/config/local.conf
+done
+
+ZT_PRIMARY_PORT=`/bin/cat /app/config/local.conf | /usr/bin/jq -r '.settings.primaryPort'`
+/app/ovnet/ovnet-one -p${ZT_PRIMARY_PORT} /app/config
