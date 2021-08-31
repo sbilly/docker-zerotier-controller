@@ -16,19 +16,6 @@ jobs:
     - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
 
     # Checkout the repository to the GitHub Actions runner
-    - name: 'Checkout'
-      uses: actions/checkout@v2
-      with:
-        token: ${{ secrets.PRIVATE_TOKEN_GITHUB }}
-        submodules: true
-
-    # Update references
-    - name: 'Git Sumbodule Update'
-      run: |
-        git pull --recurse-submodules
-        git submodule update --remote --recursive
-
-    # Checkout the repository to the GitHub Actions runner
     - uses: actions/checkout@v2
     - name: 'Build the Docker image'
       run: docker build . --file Dockerfile --tag zerotier-controller:$(date +%s)
