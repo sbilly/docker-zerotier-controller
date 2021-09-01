@@ -1,6 +1,6 @@
 # docker-zerotier-controller
 
-Dockernized ZeroTierOne Controller
+Dockernized ZeroTierOne controller with zero-ui web interface.
 
 ## Build
 
@@ -40,4 +40,4 @@ docker run --rm -ti -v `pwd`/config/identity.public:/app/config/identity.public 
 - `config`: The configurations of ZeroTierOne, such as `identity.*`, `authtoken.secret`, etc.
 - `backend`: zero-ui backend.
 - `frontend`: The static files of zero-ui frontend.
-- `ZeroTierOne`: The binaries of ZeroTierOne, such as `zerotier-c*`, `mkworld`.
+- `ZeroTierOne`: The binaries of ZeroTierOne, such as `zerotier-*`, `mkworld`.
