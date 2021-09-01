@@ -1,8 +1,8 @@
 #!/usr/bin/with-contenv bash
 
-
 if [ -z "$ZT_PRIMARY_PORT" ]; then
     ZT_PRIMARY_PORT=9993
+    mkdir -p /var/run/s6/container_environment/
     printf "9993" > /var/run/s6/container_environment/ZT_PRIMARY_PORT
 fi
 
