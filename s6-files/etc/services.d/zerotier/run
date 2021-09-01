@@ -7,7 +7,7 @@ if [ -z "$ZT_PRIMARY_PORT" ]; then
 fi
 
 while [ ! -f /app/config/local.conf ]; do
-    echo "'{'settings': {'primaryPort': ${ZT_PRIMARY_PORT},'allowManagementFrom': ['0.0.0.0/0']}}'" > /app/config/local.conf
+    echo "{\"settings\": {\"primaryPort\": ${ZT_PRIMARY_PORT}, \"allowManagementFrom\": [\"0.0.0.0/0\"]}}" > /app/config/local.conf
 done
 
 ZT_PRIMARY_PORT=`/bin/cat /app/config/local.conf | /usr/bin/jq -r '.settings.primaryPort'`

@@ -1,0 +1,7 @@
+#!/usr/bin/with-contenv sh
+
+mkdir -p /var/run/s6/container_environment
+
+if [ -z "$ZT_PRIMARY_PORT" ]; then
+    printf "9993" > /var/run/s6/container_environment/ZT_PRIMARY_PORT
+fi
