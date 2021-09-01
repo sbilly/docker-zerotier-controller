@@ -65,10 +65,11 @@ COPY --from=build-stage /src/zero-ui/frontend/build /app/frontend/build/
 WORKDIR /app/backend
 COPY --from=build-stage /src/zero-ui/backend/package*.json /app/backend
 COPY --from=build-stage /src/zero-ui/backend/yarn.lock /app/backend
-
 RUN yarn install
-
 COPY --from=build-stage /src/zero-ui/backend /app/backend
+
+# s6-overlay
+COPY ./s6-files/etc /etc/
 
 EXPOSE 3000 4000 9993 9993/UDP
 ENV S6_KEEP_ENV=1
