@@ -26,14 +26,14 @@ jobs:
     # Login to DockerHub with username and token
     - name: Login to DockerHub with username and token
       uses: docker/login-action@v1
-    - with:
+      with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     # Build image and push to DockerHub
     - name: "Build image and push to DockerHub"
       uses: docker/build-push-action@v2
-    - with:
+      with:
         context: .
         push: true
         tags: sbilly/zerotier-controller:latest
