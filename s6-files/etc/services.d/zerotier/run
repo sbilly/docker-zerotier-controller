@@ -11,4 +11,4 @@ while [ ! -f /app/config/local.conf ]; do
 done
 
 ZT_PRIMARY_PORT=`/bin/cat /app/config/local.conf | /usr/bin/jq -r '.settings.primaryPort'`
-/app/ovnet/ovnet-one -p${ZT_PRIMARY_PORT} /app/config
+/app/ZeroTierOne/zerotier-one -p${ZT_PRIMARY_PORT} /app/config
