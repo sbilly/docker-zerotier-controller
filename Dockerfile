@@ -7,6 +7,10 @@ RUN apk update && \
 
 WORKDIR /src
 
+# Prepaire Environment
+COPY ./patch /src/patch
+COPY ./config /src/config
+
 # Downloading and build latest version ZeroTierOne
 RUN ZEROTIER_ONE_VERSION=`curl --silent "https://api.github.com/repos/zerotier/ZeroTierOne/releases" | jq -r ".[0].tag_name"` && \
     curl https://codeload.github.com/zerotier/ZeroTierOne/tar.gz/refs/tags/${ZEROTIER_ONE_VERSION} --output /tmp/ZeroTierOne.tar.gz && \
@@ -15,6 +19,8 @@ RUN ZEROTIER_ONE_VERSION=`curl --silent "https://api.github.com/repos/zerotier/Z
     tar fxz /tmp/ZeroTierOne.tar.gz && \
     mv /src/ZeroTierOne-* /src/ZeroTierOne && \
     rm -rf /tmp/ZeroTierOne.tar.gz && \
+    cd /src/ && \
+    python3 /src/patch/patch.py && \
     cd /src/ZeroTierOne && \
     make central-controller CPPFLAGS+=-w && \
     cd /src/ZeroTierOne/attic/world && \
@@ -39,12 +45,14 @@ WORKDIR /app/ZeroTierOne
 
 # ZeroTierOne
 COPY --from=build-stage /src/ZeroTierOne/zerotier-one /app/ZeroTierOne/zerotier-one
-COPY --from=build-stage /src/ZeroTierOne/zerotier-cli /app/ZeroTierOne/zerotier-cli
-COPY --from=build-stage /src/ZeroTierOne/zerotier-idtool /app/ZeroTierOne/zerotier-idtool
+RUN cd /app/ZeroTierOne && \
+    ln -s zerotier-one zerotier-cli && \
+    ln -s zerotier-one zerotier-idtool
 
 # mkworld @ ZeroTierOne
 COPY --from=build-stage /src/ZeroTierOne/attic/world/mkworld /app/ZeroTierOne/mkworld
 COPY --from=build-stage /src/ZeroTierOne/attic/world/world.bin /app/config/world.bin
+COPY --from=build-stage /app/config/world.c /app/config/world.c
 
 # Envirment
 RUN apk update && \
