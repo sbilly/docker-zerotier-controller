@@ -52,7 +52,7 @@ RUN cd /app/ZeroTierOne && \
 # mkworld @ ZeroTierOne
 COPY --from=build-stage /src/ZeroTierOne/attic/world/mkworld /app/ZeroTierOne/mkworld
 COPY --from=build-stage /src/ZeroTierOne/attic/world/world.bin /app/config/world.bin
-COPY --from=build-stage /app/config/world.c /app/config/world.c
+COPY --from=build-stage /src/config/world.c /app/config/world.c
 
 # Envirment
 RUN apk update && \
