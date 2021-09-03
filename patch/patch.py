@@ -105,10 +105,19 @@ def modifyTOPOLOGY(tFile, wFile):
     file.close()
 
 
+# Patch controller/PostgreSQL.cpp
+# @pgFile, location of PostgreSQL.cpp
+def patchPOSTGRESQL(pgFile, patchFile):
+    os.system(
+        "cd {}/.. && patch -p 0 < {}".format(os.path.dirname(pgFile), os.path.abspath(patchFile)))
+
+
 def main():
     mFile = os.path.abspath("./ZeroTierOne/attic/world/mkworld.cpp")
     tFile = os.path.abspath("./ZeroTierOne/node/Topology.cpp")
+    pgFile = os.path.abspath("./ZeroTierOne/controller/PostgreSQL.cpp")
     pFile = os.path.abspath("./patch/planets.json")
+    patchFile = os.path.abspath("./patch/PostgreSQL.cpp.patch")
     wFile = os.path.abspath("./config/world.c")
 
     # Modify mkworld.cpp with planets.json
@@ -117,6 +126,8 @@ def main():
     buildMKWORLD(mFile, wFile)
     # Modify node/Topology.cpp with world.c
     modifyTOPOLOGY(tFile, wFile)
+    # Patch controller/PostgreSQL.cpp
+    patchPOSTGRESQL(pgFile, patchFile)
 
 
 main()
