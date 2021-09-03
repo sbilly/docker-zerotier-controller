@@ -1,6 +1,6 @@
 # docker-zerotier-controller
 
-Dockernized ZeroTierOne controller with zero-ui web interface.
+Dockernized ZeroTierOne controller with zero-ui web interface. [中文讨论](https://v2ex.com/t/799623)
 
 ## Customize ZeroTierOne's controller planets
 
@@ -41,9 +41,9 @@ docker run --rm -ti -v `pwd`/config/identity.public:/app/config/identity.public 
 
 - The default username/password (`admin`/`zero-ui`) is defined by `ZU_DEFAULT_USERNAME` and `ZU_DEFAULT_PASSWORD`.
 - The environment variable `ZT_PRIMARY_PORT` is ZeroTierOne's `primaryPort` in `local.conf`.
-- Other environment variables please check [zero-ui](https://github.com/dec0dOS/zero-ui/blob/main/README.md)
+- Please check [zero-ui](https://github.com/dec0dOS/zero-ui/blob/main/README.md) for other environment variables.
 
-## Files in docker image
+## Files in Docker Image
 
 ```bash
 /app/
@@ -57,3 +57,7 @@ docker run --rm -ti -v `pwd`/config/identity.public:/app/config/identity.public 
 - `backend`: zero-ui backend.
 - `frontend`: The static files of zero-ui frontend.
 - `ZeroTierOne`: The binaries of ZeroTierOne, such as `zerotier-*`, `mkworld`.
+
+## Change Log
+
+- 20210902 - First Release.
