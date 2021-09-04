@@ -26,6 +26,8 @@ docker build --force-rm . -t sbilly/zerotier-controller:latest
 
 ## Run
 
+### Controller
+
 ```bash
 # Run with default settings
 docker run --rm -ti -p 4000:4000 -p 9993:9993 -p 9993:9993/udp sbilly/zerotier-controller:latest
@@ -35,6 +37,18 @@ docker run --rm -ti -e ZU_SECURE_HEADERS=false -e ZU_CONTROLLER_ENDPOINT=http://
 
 # Run with docker volumes
 docker run --rm -ti -v `pwd`/config/identity.public:/app/config/identity.public -v `pwd`/config/identity.secret:/app/config/identity.secret -v `pwd`/config/authtoken.secret:/app/config/authtoken.secret -p 3000:3000 -p 4000:4000 -p 9993:9993 -p 9993:9993/udp sbilly/zerotier-controller:latest
+```
+
+### Peer
+
+Download `planet` from controller WEB interface to peer configuration directory. For example, `/var/lib/zerotier-one/planet`, Then start `zerotier-one`.
+
+```bash
+# Download planet
+wget http://[IP_OF_CONTROLLER]:[PORT_OF_CONTROLLER]/app/static/planet -O /var/lib/zerotier-one/planet
+
+# Start ZeroTierOne
+zerotier-one /var/lib/zerotier-one
 ```
 
 ## Environment Variables
@@ -60,4 +74,5 @@ docker run --rm -ti -v `pwd`/config/identity.public:/app/config/identity.public 
 
 ## Change Log
 
+- 20210904 - Update peer's instructions.
 - 20210902 - First Release.
