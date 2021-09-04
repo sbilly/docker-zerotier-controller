@@ -73,7 +73,8 @@ COPY --from=build-stage /src/zero-ui/frontend/build /app/frontend/build/
 WORKDIR /app/backend
 COPY --from=build-stage /src/zero-ui/backend/package*.json /app/backend
 COPY --from=build-stage /src/zero-ui/backend/yarn.lock /app/backend
-RUN yarn install
+RUN yarn install && \
+    ln -s /app/config/world.bin /app/frontend/build/static/planet
 COPY --from=build-stage /src/zero-ui/backend /app/backend
 
 # s6-overlay
