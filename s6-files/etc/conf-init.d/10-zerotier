@@ -5,3 +5,35 @@ mkdir -p /var/run/s6/container_environment
 if [ -z "$ZT_PRIMARY_PORT" ]; then
     printf "9993" > /var/run/s6/container_environment/ZT_PRIMARY_PORT
 fi
+
+if [ -z "$ZT_PGSQL" ]; then
+    printf "false" > /var/run/s6/container_environment/ZT_PGSQL
+fi
+
+if [ -z "$ZT_PGSQL_INIT" ]; then
+    printf "false" > /var/run/s6/container_environment/ZT_PGSQL_INIT
+fi
+
+if [ -z "$ZT_PGSQL_HOST" ]; then
+    printf "127.0.0.1" > /var/run/s6/container_environment/ZT_PGSQL_HOST
+fi
+
+if [ -z "$ZT_PGSQL_PORT" ]; then
+    printf "5432" > /var/run/s6/container_environment/ZT_PGSQL_PORT
+fi
+
+if [ -z "$ZT_PGSQL_DB" ]; then
+    printf "zt" > /var/run/s6/container_environment/ZT_PGSQL_DB
+fi
+
+if [ -z "$ZT_PGSQL_USER" ]; then
+    printf "zt" > /var/run/s6/container_environment/ZT_PGSQL_USER
+fi
+
+if [ -z "$ZT_PGSQL_PASS" ]; then
+    printf "zt" > /var/run/s6/container_environment/ZT_PGSQL_PASS
+fi
+
+if [ -z "$ZT_REDIS" ]; then
+    printf "false" > /var/run/s6/container_environment/ZT_REDIS
+fi

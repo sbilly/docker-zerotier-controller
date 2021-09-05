@@ -56,7 +56,7 @@ COPY --from=build-stage /src/config/world.c /app/config/world.c
 
 # Envirment
 RUN apk update && \
-    apk add libpq postgresql-dev jq curl bash wget && \
+    apk add libpq postgresql-dev postgresql jq curl bash wget && \
     mkdir -p /var/lib/zerotier-one/ && \
     ln -s /app/config/authtoken.secret /var/lib/zerotier-one/authtoken.secret
 
@@ -79,6 +79,9 @@ COPY --from=build-stage /src/zero-ui/backend /app/backend
 
 # s6-overlay
 COPY ./s6-files/etc /etc/
+
+# schema
+COPY ./schema /app/schema/
 
 EXPOSE 3000 4000 9993 9993/UDP
 ENV S6_KEEP_ENV=1

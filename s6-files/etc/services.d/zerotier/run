@@ -7,8 +7,23 @@ if [ -z "$ZT_PRIMARY_PORT" ]; then
 fi
 
 while [ ! -f /app/config/local.conf ]; do
-    echo "{\"settings\": {\"primaryPort\": ${ZT_PRIMARY_PORT}, \"allowManagementFrom\": [\"0.0.0.0/0\"]}}" > /app/config/local.conf
+    if [ "${ZT_PGSQL}" = "true" ]; then
+        # PGSQL
+        echo "{\"settings\":{\"primaryPort\":${ZT_PRIMARY_PORT},\"allowManagementFrom\":[\"0.0.0.0/0\"],\"controllerDbPath\":\"postgres:host=${ZT_PGSQL_HOST} port=${ZT_PGSQL_PORT} dbname=${ZT_PGSQL_DB} user=${ZT_PGSQL_USER} password=${ZT_PGSQL_PASS} sslmode=prefer sslcert= sslkey= sslrootcert=\",\"portMappingEnabled\":true,\"softwareUpdate\":\"disable\",\"interfacePrefixBlacklist\":[\"inot\",\"nat64\"]}}"  > /app/config/local.conf
+    else
+        # NO PGSQL
+        echo "{\"settings\": {\"primaryPort\": ${ZT_PRIMARY_PORT}, \"allowManagementFrom\": [\"0.0.0.0/0\"]}}" > /app/config/local.conf
+    fi
 done
+
+if [ -z "$ZT_PGSQL_INIT" ]; then
+    if [ "${ZT_PGSQL_INIT}" = "true" ]; then
+        # init postgresql database
+        echo "DROP DATABASE ${ZT_PGSQL_DB};\nCREATE DATABASE ${ZT_PGSQL_DB};\n" > /app/schema/createDB.sql
+        /usr/bin/psql postgresql://${ZT_PGSQL_USER}:${ZT_PGSQL_PASS}@${ZT_PGSQL_HOST}:${ZT_PGSQL_PORT}/${ZT_PGSQL_DB} -f /app/schema/createDB.sql
+        /usr/bin/psql postgresql://${ZT_PGSQL_USER}:${ZT_PGSQL_PASS}@${ZT_PGSQL_HOST}:${ZT_PGSQL_PORT}/${ZT_PGSQL_DB} -f /app/schema/createTables.sql
+    fi
+fi
 
 ZT_PRIMARY_PORT=`/bin/cat /app/config/local.conf | /usr/bin/jq -r '.settings.primaryPort'`
 /app/ZeroTierOne/zerotier-one -p${ZT_PRIMARY_PORT} /app/config
