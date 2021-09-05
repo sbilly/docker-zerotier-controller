@@ -1,6 +1,18 @@
---- controller/PostgreSQL.cpp	2021-09-04 00:14:52.463039398 +0800
-+++ controller/PostgreSQL.cpp.new	2021-09-04 00:16:38.173151427 +0800
-@@ -1476,38 +1476,40 @@ void PostgreSQL::commitThread()
+--- controller/PostgreSQL.cpp	2021-08-20 16:27:38.599930650 +0800
++++ controller/PostgreSQL.cpp.new	2021-09-05 19:48:55.925215931 +0800
+@@ -1080,7 +1080,10 @@ void PostgreSQL::commitThread()
+ 				try {
+ 					std::string memberId = (*config)["id"];
+ 					std::string networkId = (*config)["nwid"];
+-					std::string identity = (*config)["identity"];
++					std::string identity = "";
++					if (!(*config)["identity"].is_null()) {
++						std::string identity = (*config)["identity"];
++					}
+ 					std::string target = "NULL";
+ 
+ 					if (!(*config)["remoteTraceTarget"].is_null()) {
+@@ -1476,38 +1479,40 @@ void PostgreSQL::commitThread()
  						continue;
  					}
  					auto dns = (*config)["dns"];
@@ -30,7 +42,12 @@
 -						domain.c_str(),
 -						servers.str().c_str()
 -					};
--
++						const char *p[3] = {
++							id.c_str(),
++							domain.c_str(),
++							servers.str().c_str()
++						};
+ 
 -					res = PQexecParams(conn, "INSERT INTO ztc_network_dns (network_id, domain, servers) VALUES ($1, $2, $3) ON CONFLICT (network_id) DO UPDATE SET domain = EXCLUDED.domain, servers = EXCLUDED.servers",
 -						3,
 -						NULL,
@@ -40,12 +57,6 @@
 -						0);
 -					if (PQresultStatus(res) != PGRES_COMMAND_OK) {
 -						fprintf(stderr, "ERROR: Error updating DNS: %s\n", PQresultErrorMessage(res));
-+						const char *p[3] = {
-+							id.c_str(),
-+							domain.c_str(),
-+							servers.str().c_str()
-+						};
-+
 +						res = PQexecParams(conn, "INSERT INTO ztc_network_dns (network_id, domain, servers) VALUES ($1, $2, $3) ON CONFLICT (network_id) DO UPDATE SET domain = EXCLUDED.domain, servers = EXCLUDED.servers",
 +							3,
 +							NULL,
@@ -69,7 +80,7 @@
  
  					res = PQexec(conn, "COMMIT");
  					if (PQresultStatus(res) != PGRES_COMMAND_OK) {
-@@ -1533,7 +1535,7 @@ void PostgreSQL::commitThread()
+@@ -1533,7 +1538,7 @@ void PostgreSQL::commitThread()
  					}
  
  				} catch (std::exception &e) {
@@ -78,3 +89,12 @@
  				}
  				// if (_rc != NULL) {
  				// 	try {
+@@ -1551,7 +1556,7 @@ void PostgreSQL::commitThread()
+ 				// }
+ 			} else if (objtype == "_delete_network") {
+ 				try {
+-					std::string networkId = (*config)["nwid"];
++					std::string networkId = (*config)["id"];
+ 					const char *values[1] = {
+ 						networkId.c_str()
+ 					};
