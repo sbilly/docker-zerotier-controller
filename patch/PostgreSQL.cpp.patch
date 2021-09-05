@@ -1,6 +1,14 @@
 --- controller/PostgreSQL.cpp	2021-08-20 16:27:38.599930650 +0800
 +++ controller/PostgreSQL.cpp.new	2021-09-05 19:48:55.925215931 +0800
-@@ -1080,7 +1080,10 @@ void PostgreSQL::commitThread()
+@@ -582,6 +582,7 @@ void PostgreSQL::initializeMembers(PGcon
+ 
+ 			std::string ctime = PQgetvalue(res, i, 5);
+ 			config["id"] = memberId;
++			config["address"] = memberId;
+ 			config["nwid"] = networkId;
+ 			config["activeBridge"] = (strcmp(PQgetvalue(res, i, 2), "t") == 0);
+ 			config["authorized"] = (strcmp(PQgetvalue(res, i, 3), "t") == 0);
+@@ -1080,7 +1081,10 @@ void PostgreSQL::commitThread()
  				try {
  					std::string memberId = (*config)["id"];
  					std::string networkId = (*config)["nwid"];
@@ -12,7 +20,7 @@
  					std::string target = "NULL";
  
  					if (!(*config)["remoteTraceTarget"].is_null()) {
-@@ -1476,38 +1479,40 @@ void PostgreSQL::commitThread()
+@@ -1476,38 +1480,40 @@ void PostgreSQL::commitThread()
  						continue;
  					}
  					auto dns = (*config)["dns"];
@@ -80,7 +88,7 @@
  
  					res = PQexec(conn, "COMMIT");
  					if (PQresultStatus(res) != PGRES_COMMAND_OK) {
-@@ -1533,7 +1538,7 @@ void PostgreSQL::commitThread()
+@@ -1533,7 +1539,7 @@ void PostgreSQL::commitThread()
  					}
  
  				} catch (std::exception &e) {
@@ -89,7 +97,7 @@
  				}
  				// if (_rc != NULL) {
  				// 	try {
-@@ -1551,7 +1556,7 @@ void PostgreSQL::commitThread()
+@@ -1551,7 +1557,7 @@ void PostgreSQL::commitThread()
  				// }
  			} else if (objtype == "_delete_network") {
  				try {
