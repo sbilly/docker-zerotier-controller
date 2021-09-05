@@ -50,7 +50,8 @@ CREATE TABLE ztc_member (
     v_rev text,
     v_proto text,
     creation_time timestamp,    
-    deleted BOOLEAN NOT NULL DEFAULT FALSE
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    hidden BOOLEAN NOT NULL DEFAULT FALSE
 );
 CREATE UNIQUE INDEX on ztc_member (network_id, id);
 SELECT * FROM ztc_member;
