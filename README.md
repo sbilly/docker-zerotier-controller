@@ -4,14 +4,14 @@ Dockernized ZeroTierOne controller with zero-ui web interface. [中文讨论](ht
 
 ## Customize ZeroTierOne's controller planets
 
-Modify `patch/planets.json` as you needed, then build the docker image.
+Modify `patch/planets.json` as you needed, then build the docker image. I've put the `patch/planet.public` and `patch/planet.private` files in this repo.
 
 ```json
 {
   "planets": [
     {
       "Location": "Beijing", // Where this planet located
-      "Identity": "a4de2130c2:0:ab5257bb05cd2fb8044fe26483f6d27b57124ca7b350fb3e0f07d405c68c4416094dbc836bf62ed483072501aa3384dff3c74ac50050c1bfbb1dc657001ef6a1", // The planet's public key
+      "Identity": "a4de2130c2:0:ab5257bb05cd2fb8044fe26483f6d27b57124ca7b350fb3e0f07d405c68c4416094dbc836bf62ed483072501aa3384dff3c74ac50050c1bfbb1dc657001ef6a1", // The planet's public key, ex: identity.public
       "Endpoints": ["127.0.0.1/9993"] // The list of endpoints in 'ip/port' format. IPv6 is supportted
     }
   ]
