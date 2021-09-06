@@ -2,6 +2,10 @@ name: 'Build docker image'
 on: 
   # Auto build on push to main branch
   push:
+    paths-ignore:
+      - “README.md”
+      - ".gitignore"
+      - "LICENSE"
     branches:
       - main
   # Auto build @ every Monday 6:00am
