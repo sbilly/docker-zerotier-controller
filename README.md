@@ -2,6 +2,11 @@
 
 Dockernized ZeroTierOne controller with zero-ui web interface. [中文讨论](https://v2ex.com/t/799623)
 
+# Fork Modify
+
+删除了 zero-ui
+数据库初始化时，不 Drop Database \ Table
+
 ## Customize ZeroTierOne's controller planets
 
 Modify `patch/planets.json` as you needed, then build the docker image. I've put the `patch/planet.public` and `patch/planet.private` files in this repo.
@@ -21,7 +26,7 @@ Modify `patch/planets.json` as you needed, then build the docker image. I've put
 ## Build
 
 ```bash
-docker build --force-rm . -t sbilly/zerotier-controller:latest
+docker build --force-rm . -t chang/zerotier-controller:latest
 ```
 
 ## Run
@@ -30,7 +35,7 @@ docker build --force-rm . -t sbilly/zerotier-controller:latest
 
 ```bash
 # Run with default settings
-docker run --rm -ti -p 4000:4000 -p 9993:9993 -p 9993:9993/udp sbilly/zerotier-controller:latest
+docker run --rm -ti -p 4000:4000 -p 9993:9993 -p 9993:9993/udp chang/zerotier-controller:latest
 
 # Run with custom envirments settings
 docker run --rm -ti -e ZU_SECURE_HEADERS=false -e ZU_CONTROLLER_ENDPOINT=http://127.0.0.1:9993/ -e ZU_DEFAULT_USERNAME=admin -e ZU_DEFAULT_PASSWORD=zero-ui -p 4000:4000 -p 3000:3000 -p 9993:9993 -p 9993:9993/udp sbilly/zerotier-controller:latest
@@ -62,8 +67,6 @@ zerotier-one /var/lib/zerotier-one
 ```bash
 /app/
 ├── config/
-├── backend/
-├── frontend/
 └── ZeroTierOne/
 ```
 

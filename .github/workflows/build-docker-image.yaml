@@ -47,5 +47,5 @@ jobs:
       with:
         context: .
         push: true
-        tags: sbilly/zerotier-controller:latest
+        tags: chang/zerotier-controller:latest
     

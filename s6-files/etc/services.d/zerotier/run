@@ -19,9 +19,8 @@ done
 if [ -z "$ZT_PGSQL_INIT" ]; then
     if [ "${ZT_PGSQL_INIT}" = "true" ]; then
         # init postgresql database
-        echo "Init PostgreSQL database ..."
-        echo "DROP DATABASE ${ZT_PGSQL_DB};\nCREATE DATABASE ${ZT_PGSQL_DB};\n" > /app/schema/createDB.sql
-        /usr/bin/psql postgresql://${ZT_PGSQL_USER}:${ZT_PGSQL_PASS}@${ZT_PGSQL_HOST}:${ZT_PGSQL_PORT}/ -f /app/schema/createDB.sql
+        echo "Init PostgreSQL database ..." 
+        echo "SELECT 'CREATE DATABASE ${ZT_PGSQL_DB}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${ZT_PGSQL_DB}')\gexec" | /usr/bin/psql postgresql://${ZT_PGSQL_USER}:${ZT_PGSQL_PASS}@${ZT_PGSQL_HOST}:${ZT_PGSQL_PORT}/ 
         /usr/bin/psql postgresql://${ZT_PGSQL_USER}:${ZT_PGSQL_PASS}@${ZT_PGSQL_HOST}:${ZT_PGSQL_PORT}/${ZT_PGSQL_DB} -f /app/schema/createTables.sql
     fi
 fi

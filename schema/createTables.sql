@@ -1,12 +1,11 @@
-DROP TABLE ztc_database;
-CREATE TABLE ztc_database (
+CREATE TABLE IF NOT EXISTS ztc_database (
     version integer
 );
+DELETE FROM ztc_database;
 INSERT INTO ztc_database VALUES (5);
 SELECT * FROM ztc_database;
 
-DROP TABLE ztc_network;
-CREATE TABLE ztc_network (
+CREATE TABLE IF NOT EXISTS ztc_network (
     id text UNIQUE,
     creation_time timestamp,
     owner_id text,
@@ -30,8 +29,7 @@ CREATE TABLE ztc_network (
 );
 SELECT * FROM ztc_network;
 
-DROP TABLE ztc_member;
-CREATE TABLE ztc_member (
+CREATE TABLE IF NOT EXISTS ztc_member (
     id text,
     network_id text,
     active_bridge BOOLEAN NOT NULL DEFAULT FALSE,
@@ -53,11 +51,10 @@ CREATE TABLE ztc_member (
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
     hidden BOOLEAN NOT NULL DEFAULT FALSE
 );
-CREATE UNIQUE INDEX on ztc_member (network_id, id);
+CREATE UNIQUE INDEX IF NOT EXISTS ztc_member_network_id_id_idx on ztc_member (network_id, id);
 SELECT * FROM ztc_member;
 
-DROP TABLE ztc_controller;
-CREATE TABLE ztc_controller (
+CREATE TABLE IF NOT EXISTS ztc_controller (
     id text UNIQUE,
     cluster_host text,
     last_alive timestamp,
@@ -72,8 +69,7 @@ CREATE TABLE ztc_controller (
 );
 SELECT * FROM ztc_controller;
 
-DROP TABLE ztc_global_permissions;
-CREATE TABLE ztc_global_permissions (
+CREATE TABLE IF NOT EXISTS ztc_global_permissions (
     user_id text,
     authorize boolean,
     del boolean,
@@ -82,16 +78,14 @@ CREATE TABLE ztc_global_permissions (
 );
 SELECT * FROM ztc_global_permissions;
 
-DROP TABLE ztc_network_assignment_pool;
-CREATE TABLE ztc_network_assignment_pool (
+CREATE TABLE IF NOT EXISTS ztc_network_assignment_pool (
     network_id text,
     ip_range_start inet,
     ip_range_end inet
 );
 SELECT * FROM ztc_network_assignment_pool;
 
-DROP TABLE ztc_network_route;
-CREATE TABLE ztc_network_route (
+CREATE TABLE IF NOT EXISTS ztc_network_route (
     network_id text,
     address inet,
     bits text,
@@ -99,8 +93,7 @@ CREATE TABLE ztc_network_route (
 );
 SELECT * FROM ztc_network_route;
 
-DROP TABLE ztc_network_dns;
-CREATE TABLE ztc_network_dns (
+CREATE TABLE IF NOT EXISTS ztc_network_dns (
     network_id text,
     domain text,
     servers text
@@ -108,21 +101,20 @@ CREATE TABLE ztc_network_dns (
 SELECT * FROM ztc_network_dns;
 
 
-DROP TABLE ztc_member_ip_assignment;
-CREATE TABLE ztc_member_ip_assignment (
+CREATE TABLE IF NOT EXISTS ztc_member_ip_assignment (
     network_id text,
     member_id text,
     address inet
 );
-CREATE UNIQUE INDEX on ztc_member_ip_assignment (network_id, member_id, address);
+
+CREATE UNIQUE INDEX IF NOT EXISTS ztc_member_ip_assignment_network_id_member_id_address_idx on ztc_member_ip_assignment (network_id, member_id, address);
 SELECT * FROM ztc_member_ip_assignment;
 
-DROP TABLE ztc_member_status;
-CREATE TABLE ztc_member_status (
+CREATE TABLE IF NOT EXISTS ztc_member_status (
     network_id text,
     member_id text,
     address inet,
     last_updated text
 );
-CREATE UNIQUE INDEX on ztc_member_status (network_id, member_id);
+CREATE UNIQUE INDEX IF NOT EXISTS ztc_member_status_network_id_member_id_idx on ztc_member_status (network_id, member_id);
 SELECT * FROM ztc_member_status;
