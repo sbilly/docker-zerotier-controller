@@ -50,7 +50,7 @@ RUN ZERO_UI_VERSION=`curl --silent "https://api.github.com/repos/dec0dOS/zero-ui
     mv /src/zero-ui-* /src/zero-ui && \
     rm -rf /tmp/zero-ui.tar.gz && \
     cd /src/zero-ui && \
-    yarn set version ${YARN_VERSION}} && \
+    yarn set version ${YARN_VERSION} && \
     yarn install && \
     yarn installDeps && \
     yarn build
@@ -93,7 +93,7 @@ COPY --from=build-stage /src/zero-ui/frontend/build /app/frontend/build/
 WORKDIR /app/backend
 COPY --from=build-stage /src/zero-ui/backend/package*.json /app/backend
 COPY --from=build-stage /src/zero-ui/backend/yarn.lock /app/backend
-RUN yarn set version ${YARN_VERSION}} && \
+RUN yarn set version ${YARN_VERSION} && \
     yarn install && \
     ln -s /app/config/world.bin /app/frontend/build/static/planet
 COPY --from=build-stage /src/zero-ui/backend /app/backend
