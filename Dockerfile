@@ -47,6 +47,7 @@ RUN ZERO_UI_VERSION=`curl --silent "https://api.github.com/repos/dec0dOS/zero-ui
     mv /src/zero-ui-* /src/zero-ui && \
     rm -rf /tmp/zero-ui.tar.gz && \
     cd /src/zero-ui && \
+    yarn set version 2.4.0 && \
     yarn install && \
     yarn installDeps && \
     yarn build
