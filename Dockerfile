@@ -2,6 +2,9 @@ FROM node:current-alpine as build-stage
 LABEL Author="sbilly <superli_1980@hotmail.com>"
 LABEL Maintainer="sbilly <superli_1980@hotmail.com>"
 
+ENV NODE_OPTIONS=--openssl-legacy-provider
+ENV YARN_VERSION=2.4.0
+
 RUN apk update && \
     apk add python3 alpine-sdk gcc wget git linux-headers libpq postgresql-dev bash jq
 
@@ -47,7 +50,7 @@ RUN ZERO_UI_VERSION=`curl --silent "https://api.github.com/repos/dec0dOS/zero-ui
     mv /src/zero-ui-* /src/zero-ui && \
     rm -rf /tmp/zero-ui.tar.gz && \
     cd /src/zero-ui && \
-    yarn set version 2.4.0 && \
+    yarn set version ${YARN_VERSION}} && \
     yarn install && \
     yarn installDeps && \
     yarn build
@@ -90,7 +93,7 @@ COPY --from=build-stage /src/zero-ui/frontend/build /app/frontend/build/
 WORKDIR /app/backend
 COPY --from=build-stage /src/zero-ui/backend/package*.json /app/backend
 COPY --from=build-stage /src/zero-ui/backend/yarn.lock /app/backend
-RUN yarn set version 2.4.0 && \
+RUN yarn set version ${YARN_VERSION}} && \
     yarn install && \
     ln -s /app/config/world.bin /app/frontend/build/static/planet
 COPY --from=build-stage /src/zero-ui/backend /app/backend
