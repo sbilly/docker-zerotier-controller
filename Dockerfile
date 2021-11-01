@@ -11,6 +11,19 @@ WORKDIR /src
 COPY ./patch /src/patch
 COPY ./config /src/config
 
+# Downloading and build latest libpqxx
+RUN LIBPQXX_VERSION=`curl --silent "https://api.github.com/repos/jtv/libpqxx/releases" | jq -r ".[0].tag_name"` && \
+    curl https://codeload.github.com/jtv/libpqxx/tar.gz/refs/tags/${LIBPQXX_VERSION} --output /tmp/libpqxx.tar.gz && \
+    mkdir -p /src && \
+    cd /src && \
+    tar fxz /tmp/libpqxx.tar.gz && \
+    mv /src/libpqxx-* /src/libpqxx && \
+    rm -rf /tmp/libpqxx.tar.gz && \
+    cd /src/libpqxx && \
+    /src/libpqxx/configure && \
+    make && \
+    make install
+
 # Downloading and build latest version ZeroTierOne
 RUN ZEROTIER_ONE_VERSION=`curl --silent "https://api.github.com/repos/zerotier/ZeroTierOne/releases" | jq -r ".[0].tag_name"` && \
     curl https://codeload.github.com/zerotier/ZeroTierOne/tar.gz/refs/tags/${ZEROTIER_ONE_VERSION} --output /tmp/ZeroTierOne.tar.gz && \
@@ -19,7 +32,6 @@ RUN ZEROTIER_ONE_VERSION=`curl --silent "https://api.github.com/repos/zerotier/Z
     tar fxz /tmp/ZeroTierOne.tar.gz && \
     mv /src/ZeroTierOne-* /src/ZeroTierOne && \
     rm -rf /tmp/ZeroTierOne.tar.gz && \
-    cd /src/ && \
     python3 /src/patch/patch.py && \
     cd /src/ZeroTierOne && \
     make central-controller CPPFLAGS+=-w && \
@@ -42,6 +54,10 @@ RUN ZERO_UI_VERSION=`curl --silent "https://api.github.com/repos/dec0dOS/zero-ui
 FROM node:current-alpine
 
 WORKDIR /app/ZeroTierOne
+
+# libpqxx
+COPY --from=build-stage /usr/local/lib/libpqxx.la /usr/local/lib/libpqxx.la
+COPY --from=build-stage /usr/local/lib/libpqxx.a /usr/local/lib/libpqxx.a
 
 # ZeroTierOne
 COPY --from=build-stage /src/ZeroTierOne/zerotier-one /app/ZeroTierOne/zerotier-one
