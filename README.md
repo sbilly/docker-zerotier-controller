@@ -74,11 +74,13 @@ zerotier-one /var/lib/zerotier-one
 
 ## FAQ
 
-1. What's the difference from the official docker image of [zero-ui](https://github.com/dec0dOS/zero-ui)/[ztncui](https://github.com/key-networks/ztncui)
-The offical docker images of [zero-ui](https://github.com/dec0dOS/zero-ui) and [ztncui](https://github.com/key-networks/ztncui) are controller‘s interface. And we provide full operational functions of planet/controller/controller-ui of ZeroTier.
+- **What's the difference from the official docker image of [zero-ui](https://github.com/dec0dOS/zero-ui)/[ztncui](https://github.com/key-networks/ztncui)**
+
+  The offical docker images of [zero-ui](https://github.com/dec0dOS/zero-ui) and [ztncui](https://github.com/key-networks/ztncui) are controller‘s interface. And we provide full operational functions of planet/controller/controller-ui of ZeroTier.
 
 
 ## Change Log
 
+- 20211206 - Add FAQ section.
 - 20210904 - Update peer's instructions.
 - 20210902 - First Release.
