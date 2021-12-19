@@ -23,7 +23,7 @@ RUN LIBPQXX_VERSION=`curl --silent "https://api.github.com/repos/jtv/libpqxx/rel
     mv /src/libpqxx-* /src/libpqxx && \
     rm -rf /tmp/libpqxx.tar.gz && \
     cd /src/libpqxx && \
-    /src/libpqxx/configure && \
+    /src/libpqxx/configure --disable-documentation && \
     make && \
     make install
 
