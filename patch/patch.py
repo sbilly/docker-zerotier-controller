@@ -127,7 +127,7 @@ def main():
     # Modify node/Topology.cpp with world.c
     modifyTOPOLOGY(tFile, wFile)
     # Patch controller/PostgreSQL.cpp
-    patchPOSTGRESQL(pgFile, patchFile)
+    # patchPOSTGRESQL(pgFile, patchFile)
 
 
 main()
