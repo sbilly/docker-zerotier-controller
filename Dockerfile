@@ -4,6 +4,9 @@ LABEL Maintainer="sbilly <superli_1980@hotmail.com>"
 
 ENV NODE_OPTIONS=--openssl-legacy-provider
 ENV YARN_VERSION=2.4.0
+# ENV ZEROTIER_ONE_VERSION=`curl --silent "https://api.github.com/repos/zerotier/ZeroTierOne/releases" | jq -r ".[0].tag_name"`
+ENV ZEROTIER_ONE_VERSION=1.6.6
+    
 
 RUN apk update && \
     apk add python3 alpine-sdk gcc wget git linux-headers libpq postgresql-dev bash jq
@@ -28,8 +31,7 @@ RUN LIBPQXX_VERSION=`curl --silent "https://api.github.com/repos/jtv/libpqxx/rel
     make install
 
 # Downloading and build latest version ZeroTierOne
-RUN ZEROTIER_ONE_VERSION=`curl --silent "https://api.github.com/repos/zerotier/ZeroTierOne/releases" | jq -r ".[0].tag_name"` && \
-    curl https://codeload.github.com/zerotier/ZeroTierOne/tar.gz/refs/tags/${ZEROTIER_ONE_VERSION} --output /tmp/ZeroTierOne.tar.gz && \
+RUN curl https://codeload.github.com/zerotier/ZeroTierOne/tar.gz/refs/tags/${ZEROTIER_ONE_VERSION} --output /tmp/ZeroTierOne.tar.gz && \
     mkdir -p /src && \
     cd /src && \
     tar fxz /tmp/ZeroTierOne.tar.gz && \
