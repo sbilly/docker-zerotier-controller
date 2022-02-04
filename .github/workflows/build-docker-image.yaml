@@ -49,3 +49,4 @@ jobs:
         push: true
         tags: sbilly/zerotier-controller:latest
     
+
