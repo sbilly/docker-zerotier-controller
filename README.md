@@ -33,7 +33,7 @@ docker build --force-rm . -t sbilly/zerotier-controller:latest
 docker run --rm -ti -p 4000:4000 -p 9993:9993 -p 9993:9993/udp sbilly/zerotier-controller:latest
 
 # Run with custom envirments settings
-docker run --rm -ti -e ZU_SECURE_HEADERS=false -e ZU_CONTROLLER_ENDPOINT=http://127.0.0.1:9993/ -e ZU_DEFAULT_USERNAME=admin -e ZU_DEFAULT_PASSWORD=zero-ui -p 4000:4000 -p 3000:3000 -p 9993:9993 -p 9993:9993/udp sbilly/zerotier-controller:latest
+docker run --rm -ti -e ZU_SECURE_HEADERS=false -e ZU_CONTROLLER_ENDPOINT=http://127.0.0.1:9993/ -e ZU_DEFAULT_USERNAME=admin -e ZU_DEFAULT_PASSWORD=zero-ui -p 4000:4000 -p 9993:9993 -p 9993:9993/udp sbilly/zerotier-controller:latest
 
 # Run with docker volumes
 docker run --rm -ti -v `pwd`/config/identity.public:/app/config/identity.public -v `pwd`/config/identity.secret:/app/config/identity.secret -v `pwd`/config/authtoken.secret:/app/config/authtoken.secret -p 3000:3000 -p 4000:4000 -p 9993:9993 -p 9993:9993/udp sbilly/zerotier-controller:latest
@@ -80,7 +80,7 @@ zerotier-one /var/lib/zerotier-one
 
 
 ## Change Log
-
+- 20220215 - Update software versions and Readme
 - 20211206 - Add FAQ section.
 - 20210904 - Update peer's instructions.
 - 20210902 - First Release.

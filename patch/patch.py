@@ -6,6 +6,10 @@ import json
 import time
 from datetime import datetime
 
+# Check patch allow variable
+if os.environ.get('PATCH_ALLOW', '0') != '1':
+    print("PATCH: Nothing to do")
+    exit()
 
 # Load data from planets.json
 # @pFile, location of planets.json
