@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv bash
+#!/command/with-contenv bash
 
 if [ -z "$NODE_ENV" ]; then
     NODE_ENV=production

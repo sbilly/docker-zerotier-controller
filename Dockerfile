@@ -7,10 +7,11 @@ ENV ZEROTIER_ONE_VERSION=1.8.4
 ENV PATCH_ALLOW=0
     
 RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* && \
-    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://linuxsoft.cern.ch/centos-vault|g' /etc/yum.repos.d/CentOS-Linux-* && \
+    echo -e 'deltarpm=0\ntimeout=300\nminrate=100' >> /etc/yum.conf
 
-RUN curl --silent --location http://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo && \
-    rpm --import http://dl.yarnpkg.com/rpm/pubkey.gpg && \
+RUN curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo && \
+    rpm --import https://dl.yarnpkg.com/rpm/pubkey.gpg && \
     curl -fsSL https://rpm.nodesource.com/setup_${NODE_VERSION} | bash - && \
     dnf install -y nodejs yarn python3 wget git bash jq postgresql-devel curl gcc-c++ glibc-headers tar make diffutils patch
 
@@ -82,20 +83,25 @@ COPY --from=build-stage /src/config/world.c /app/config/world.c
 
 # Envirment
 RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* && \
-    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://linuxsoft.cern.ch/centos-vault|g' /etc/yum.repos.d/CentOS-Linux-* && \
+    echo -e 'deltarpm=0\ntimeout=300\nminrate=100' >> /etc/yum.conf
 
-RUN curl --silent --location http://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo && \
-    rpm --import http://dl.yarnpkg.com/rpm/pubkey.gpg && \
+RUN curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo && \
+    rpm --import https://dl.yarnpkg.com/rpm/pubkey.gpg && \
     curl -fsSL https://rpm.nodesource.com/setup_${NODE_VERSION} | bash - && \
+    dnf update -y && \
     dnf install -y nodejs yarn postgresql libpq wget git bash jq postgresql-devel tar gcc-c++ make xz && \
     mkdir -p /var/lib/zerotier-one/ && \
     ln -s /app/config/authtoken.secret /var/lib/zerotier-one/authtoken.secret
 
 # Installing s6-overlay
 RUN S6_OVERLAY_VERSION=`curl --silent "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | jq -r .tag_name | sed 's/^v//'` && \
-    curl --silent --location https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz -o /tmp/s6-overlay-amd64.tar.xz && \
-    tar -xf /tmp/s6-overlay-amd64.tar.xz -C / && \
-    rm -rf /tmp/s6-overlay-amd64.tar.xz
+    cd /tmp && \
+    curl --silent --location https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch-${S6_OVERLAY_VERSION}.tar.xz --output s6-overlay-noarch-${S6_OVERLAY_VERSION}.tar.xz && \
+    curl --silent --location https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz --output s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz && \
+    tar -C / -Jxpf /tmp/s6-overlay-noarch-${S6_OVERLAY_VERSION}.tar.xz && \
+    tar -C / -Jxpf /tmp/s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz && \
+    rm -f /tmp/*.xz
 
 # Frontend @ zero-ui
 COPY --from=build-stage /src/zero-ui/frontend/build /app/frontend/build/
@@ -109,6 +115,7 @@ COPY --from=build-stage /src/zero-ui/backend /app/backend
 
 # s6-overlay
 COPY ./s6-files/etc /etc/
+RUN chmod +x /etc/services.d/*/run
 
 # schema
 COPY ./schema /app/schema/
