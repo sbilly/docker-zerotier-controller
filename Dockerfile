@@ -90,7 +90,8 @@ RUN curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.re
     rpm --import https://dl.yarnpkg.com/rpm/pubkey.gpg && \
     curl -fsSL https://rpm.nodesource.com/setup_${NODE_VERSION} | bash - && \
     dnf update -y && \
-    dnf install -y nodejs yarn postgresql libpq wget git bash jq postgresql-devel tar gcc-c++ make xz && \
+    dnf module enable -y postgresql:10 && \
+    dnf install -y nodejs yarn postgresql-server libpq wget git bash jq postgresql-devel tar gcc-c++ make xz && \
     mkdir -p /var/lib/zerotier-one/ && \
     ln -s /app/config/authtoken.secret /var/lib/zerotier-one/authtoken.secret
 
