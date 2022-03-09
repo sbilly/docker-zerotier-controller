@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv bash
+#!/command/with-contenv bash
 
 if [ -z "$ZT_PRIMARY_PORT" ]; then
     ZT_PRIMARY_PORT=9993

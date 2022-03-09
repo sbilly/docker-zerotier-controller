@@ -1,15 +1,19 @@
-FROM node:current-alpine as build-stage
-LABEL Author="sbilly <superli_1980@hotmail.com>"
-LABEL Maintainer="sbilly <superli_1980@hotmail.com>"
+FROM centos:8 as build-stage
 
 ENV NODE_OPTIONS=--openssl-legacy-provider
-ENV YARN_VERSION=2.4.0
-# ENV ZEROTIER_ONE_VERSION=`curl --silent "https://api.github.com/repos/zerotier/ZeroTierOne/releases" | jq -r ".[0].tag_name"`
-ENV ZEROTIER_ONE_VERSION=1.6.6
-    
+ENV NODE_VERSION=17.x
+ENV ZEROTIER_ONE_VERSION=1.8.4
 
-RUN apk update && \
-    apk add python3 alpine-sdk gcc wget git linux-headers libpq postgresql-dev bash jq
+ENV PATCH_ALLOW=0
+    
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* && \
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://linuxsoft.cern.ch/centos-vault|g' /etc/yum.repos.d/CentOS-Linux-* && \
+    echo -e 'deltarpm=0\ntimeout=300\nminrate=100' >> /etc/yum.conf
+
+RUN curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo && \
+    rpm --import https://dl.yarnpkg.com/rpm/pubkey.gpg && \
+    curl -fsSL https://rpm.nodesource.com/setup_${NODE_VERSION} | bash - && \
+    dnf install -y nodejs yarn python3 wget git bash jq postgresql-devel curl gcc-c++ glibc-headers tar make diffutils patch
 
 WORKDIR /src
 
@@ -26,7 +30,7 @@ RUN LIBPQXX_VERSION=`curl --silent "https://api.github.com/repos/jtv/libpqxx/rel
     mv /src/libpqxx-* /src/libpqxx && \
     rm -rf /tmp/libpqxx.tar.gz && \
     cd /src/libpqxx && \
-    /src/libpqxx/configure --disable-documentation && \
+    /src/libpqxx/configure --disable-documentation --with-pic && \
     make && \
     make install
 
@@ -36,9 +40,11 @@ RUN curl https://codeload.github.com/zerotier/ZeroTierOne/tar.gz/refs/tags/${ZER
     cd /src && \
     tar fxz /tmp/ZeroTierOne.tar.gz && \
     mv /src/ZeroTierOne-* /src/ZeroTierOne && \
-    rm -rf /tmp/ZeroTierOne.tar.gz && \
-    python3 /src/patch/patch.py && \
-    cd /src/ZeroTierOne && \
+    rm -rf /tmp/ZeroTierOne.tar.gz
+
+RUN python3 /src/patch/patch.py
+
+RUN cd /src/ZeroTierOne && \
     make central-controller CPPFLAGS+=-w && \
     cd /src/ZeroTierOne/attic/world && \
     bash build.sh
@@ -52,12 +58,11 @@ RUN ZERO_UI_VERSION=`curl --silent "https://api.github.com/repos/dec0dOS/zero-ui
     mv /src/zero-ui-* /src/zero-ui && \
     rm -rf /tmp/zero-ui.tar.gz && \
     cd /src/zero-ui && \
-    yarn set version ${YARN_VERSION} && \
     yarn install && \
     yarn installDeps && \
     yarn build
 
-FROM node:current-alpine
+FROM centos:8
 
 WORKDIR /app/ZeroTierOne
 
@@ -77,16 +82,27 @@ COPY --from=build-stage /src/ZeroTierOne/attic/world/world.bin /app/config/world
 COPY --from=build-stage /src/config/world.c /app/config/world.c
 
 # Envirment
-RUN apk update && \
-    apk add libpq postgresql-dev postgresql jq curl bash wget && \
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* && \
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://linuxsoft.cern.ch/centos-vault|g' /etc/yum.repos.d/CentOS-Linux-* && \
+    echo -e 'deltarpm=0\ntimeout=300\nminrate=100' >> /etc/yum.conf
+
+RUN curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo && \
+    rpm --import https://dl.yarnpkg.com/rpm/pubkey.gpg && \
+    curl -fsSL https://rpm.nodesource.com/setup_${NODE_VERSION} | bash - && \
+    dnf update -y && \
+    dnf module enable -y postgresql:10 && \
+    dnf install -y nodejs yarn postgresql-server libpq wget git bash jq postgresql-devel tar gcc-c++ make xz && \
     mkdir -p /var/lib/zerotier-one/ && \
     ln -s /app/config/authtoken.secret /var/lib/zerotier-one/authtoken.secret
 
 # Installing s6-overlay
-RUN S6_OVERLAY_VERSION=`curl --silent "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | jq -r .tag_name` && \
-    wget https://github.com/just-containers/s6-overlay/releases/download/${S6_OVERLAY_VERSION}/s6-overlay-amd64.tar.gz -O /tmp/s6-overlay-amd64.tar.gz && \
-    gunzip -c /tmp/s6-overlay-amd64.tar.gz | tar -xf - -C / && \
-    rm -rf /tmp/s6-overlay-amd64.tar.gz
+RUN S6_OVERLAY_VERSION=`curl --silent "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | jq -r .tag_name | sed 's/^v//'` && \
+    cd /tmp && \
+    curl --silent --location https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz --output s6-overlay-noarch-${S6_OVERLAY_VERSION}.tar.xz && \
+    curl --silent --location https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz --output s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz && \
+    tar -C / -Jxpf /tmp/s6-overlay-noarch-${S6_OVERLAY_VERSION}.tar.xz && \
+    tar -C / -Jxpf /tmp/s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz && \
+    rm -f /tmp/*.xz
 
 # Frontend @ zero-ui
 COPY --from=build-stage /src/zero-ui/frontend/build /app/frontend/build/
@@ -94,14 +110,13 @@ COPY --from=build-stage /src/zero-ui/frontend/build /app/frontend/build/
 # Backend @ zero-ui
 WORKDIR /app/backend
 COPY --from=build-stage /src/zero-ui/backend/package*.json /app/backend
-COPY --from=build-stage /src/zero-ui/backend/yarn.lock /app/backend
-RUN yarn set version ${YARN_VERSION} && \
-    yarn install && \
+RUN yarn install && \
     ln -s /app/config/world.bin /app/frontend/build/static/planet
 COPY --from=build-stage /src/zero-ui/backend /app/backend
 
 # s6-overlay
 COPY ./s6-files/etc /etc/
+RUN chmod +x /etc/services.d/*/run
 
 # schema
 COPY ./schema /app/schema/
