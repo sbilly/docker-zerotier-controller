@@ -2,7 +2,8 @@ FROM centos:8 as build-stage
 
 ENV NODE_OPTIONS=--openssl-legacy-provider
 ENV NODE_VERSION=17.x
-ENV ZEROTIER_ONE_VERSION=1.8.4
+ENV ZEROTIER_ONE_VERSION=1.8.7
+ENV LIBPQXX_VERSION=7.6.1
 
 ENV PATCH_ALLOW=0
     
@@ -13,7 +14,7 @@ RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* && \
 RUN curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo && \
     rpm --import https://dl.yarnpkg.com/rpm/pubkey.gpg && \
     curl -fsSL https://rpm.nodesource.com/setup_${NODE_VERSION} | bash - && \
-    dnf install -y nodejs yarn python3 wget git bash jq postgresql-devel curl gcc-c++ glibc-headers tar make diffutils patch
+    dnf install -y nodejs yarn python3 wget git bash jq postgresql-devel curl gcc-c++ glibc-headers tar make diffutils patch cargo openssl-devel
 
 WORKDIR /src
 
@@ -22,8 +23,7 @@ COPY ./patch /src/patch
 COPY ./config /src/config
 
 # Downloading and build latest libpqxx
-RUN LIBPQXX_VERSION=`curl --silent "https://api.github.com/repos/jtv/libpqxx/releases" | jq -r ".[0].tag_name"` && \
-    curl https://codeload.github.com/jtv/libpqxx/tar.gz/refs/tags/${LIBPQXX_VERSION} --output /tmp/libpqxx.tar.gz && \
+RUN curl https://codeload.github.com/jtv/libpqxx/tar.gz/refs/tags/${LIBPQXX_VERSION} --output /tmp/libpqxx.tar.gz && \
     mkdir -p /src && \
     cd /src && \
     tar fxz /tmp/libpqxx.tar.gz && \
@@ -91,7 +91,7 @@ RUN curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.re
     curl -fsSL https://rpm.nodesource.com/setup_${NODE_VERSION} | bash - && \
     dnf update -y && \
     dnf module enable -y postgresql:10 && \
-    dnf install -y nodejs yarn postgresql-server libpq wget git bash jq postgresql-devel tar gcc-c++ make xz && \
+    dnf install -y nodejs yarn postgresql-server libpq wget git bash jq postgresql-devel tar gcc-c++ make xz openssl && \
     mkdir -p /var/lib/zerotier-one/ && \
     ln -s /app/config/authtoken.secret /var/lib/zerotier-one/authtoken.secret
 
