@@ -2,7 +2,7 @@ FROM centos:8 as build-stage
 
 ENV NODE_OPTIONS=--openssl-legacy-provider
 ENV NODE_VERSION=17.x
-ENV ZEROTIER_ONE_VERSION=1.8.4
+ENV ZEROTIER_ONE_VERSION=1.8.7
 
 ENV PATCH_ALLOW=0
     
