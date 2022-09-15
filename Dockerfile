@@ -1,8 +1,8 @@
 FROM centos:8 as build-stage
 
-ENV NODE_OPTIONS=--openssl-legacy-provider
+#ENV NODE_OPTIONS=--openssl-legacy-provider
 ENV NODE_VERSION=17.x
-ENV ZEROTIER_ONE_VERSION=1.8.4
+ENV ZEROTIER_ONE_VERSION=1.8.9
 
 ENV PATCH_ALLOW=0
     
@@ -13,7 +13,12 @@ RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* && \
 RUN curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo && \
     rpm --import https://dl.yarnpkg.com/rpm/pubkey.gpg && \
     curl -fsSL https://rpm.nodesource.com/setup_${NODE_VERSION} | bash - && \
-    dnf install -y nodejs yarn python3 wget git bash jq postgresql-devel curl gcc-c++ glibc-headers tar make diffutils patch
+    dnf module enable -y nodejs:12 && \
+    dnf install -y nodejs yarn python3 wget git bash jq postgresql-devel curl gcc-c++ glibc-headers tar make diffutils patch openssl-devel
+
+RUN curl -fsSL https://sh.rustup.rs -sSf | sh -s -- --default-toolchain nightly -y 
+RUN export PATH="$HOME/.cargo/bin:$PATH" 
+RUN $HOME/.cargo/bin/rustup toolchain install nightly
 
 WORKDIR /src
 
@@ -30,7 +35,7 @@ RUN LIBPQXX_VERSION=`curl --silent "https://api.github.com/repos/jtv/libpqxx/rel
     mv /src/libpqxx-* /src/libpqxx && \
     rm -rf /tmp/libpqxx.tar.gz && \
     cd /src/libpqxx && \
-    /src/libpqxx/configure --disable-documentation --with-pic && \
+    /src/libpqxx/configure CXXFLAGS="-std=c++17" --disable-documentation --with-pic && \
     make && \
     make install
 
@@ -59,7 +64,7 @@ RUN ZERO_UI_VERSION=`curl --silent "https://api.github.com/repos/dec0dOS/zero-ui
     rm -rf /tmp/zero-ui.tar.gz && \
     cd /src/zero-ui && \
     yarn install && \
-    yarn installDeps && \
+#    yarn installDeps && \
     yarn build
 
 FROM centos:8
@@ -106,6 +111,8 @@ RUN S6_OVERLAY_VERSION=`curl --silent "https://api.github.com/repos/just-contain
 
 # Frontend @ zero-ui
 COPY --from=build-stage /src/zero-ui/frontend/build /app/frontend/build/
+
+RUN npm install n -g && n 14.17.0
 
 # Backend @ zero-ui
 WORKDIR /app/backend
